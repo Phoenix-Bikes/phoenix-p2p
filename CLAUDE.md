@@ -232,6 +232,31 @@ Public feed on campaign page with optional participant notification.
 
 Default is quiet — update appears on page, no email. Admin explicitly toggles "Send email notification" for important updates only (e.g. "Pickup location changed").
 
+#### `campaign_media`
+Photos and videos managed by admin and pushed to all participant/team/campaign pages via the `media-gallery` block.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | UUID | PK |
+| campaign_id | UUID | FK → campaigns |
+| type | ENUM | photo, video |
+| url | TEXT | Supabase Storage URL (photos) or external embed URL (YouTube, Vimeo) |
+| thumbnail_url | TEXT | Auto-generated for videos, resized for photos |
+| title | TEXT | Optional caption |
+| description | TEXT | Optional longer description |
+| sort_order | INT | Display order in gallery |
+| published | BOOLEAN | Toggle visibility without deleting |
+| uploaded_by | UUID | FK → admin_users |
+| created_at | TIMESTAMPTZ | |
+
+**How it works:**
+- Admin uploads photos or pastes video URLs (YouTube/Vimeo) in campaign dashboard
+- Media appears on **every participant and team page** via the `media-gallery` block — participants don't control this content
+- This is how Phoenix Bikes showcases youth impact across all fundraiser pages without relying on each participant to add media
+- The `media-gallery` block is **locked** — participants can't remove it (same as info-block)
+- Admin can toggle `published` to show/hide individual items without deleting
+- Photos stored in Supabase Storage; videos are embedded from YouTube/Vimeo (no self-hosting video)
+
 #### `drip_sequences`
 Automated email sequence, relative to each participant's registration date.
 
@@ -367,6 +392,7 @@ fundraise.phoenixbikes.org/admin/
 | `share` | Participant, Team | Copy link, social sharing, QR code, mailto |
 | `milestone-feed` | All | Auto-generated progress updates |
 | `campaign-updates` | Campaign | Public update feed from admin |
+| `media-gallery` | All | Campaign photos + videos pushed by admin to all pages |
 | `email-toolkit` | Participant (edit mode only) | Copy-paste email examples |
 | `team-invite` | Participant (edit mode only) | Send invite or share join link |
 | `incentive-tracker` | Participant (edit mode only) | Unlocked/locked rewards with gap amounts |
@@ -379,6 +405,7 @@ Campaign sets defaults. Participants can reorder blocks and edit content within 
 - `info-block` is **locked** — content comes from campaign, participant can't edit or remove
 - `cta` (donate button) is **locked** — always present, always functional
 - `thermometer` is **locked** — always shows real data
+- `media-gallery` is **locked** — admin-managed photos/videos of youth impact, pushed to all pages
 - `personal-story`, `hero` — participant can edit freely
 - Block order — participant can reorder within their page
 - No custom HTML/CSS/JS injection — blocks only
