@@ -11,6 +11,50 @@
 
 Replace Qgiv for P2P fundraising events like Raise and Ride. Participants create fundraising pages, join teams, collect donations, and track progress. Admin sets up campaigns, manages registrations, records offline payments, and syncs everything to Bloomerang.
 
+## Design Language
+
+Inspired by the FootyWeather demo app (`/Users/tomshannon/footyweather-demo/src/App.jsx`). Adapted for Phoenix Bikes:
+
+### Visual System
+
+| Element | FootyWeather | Phoenix P2P |
+|---------|-------------|-------------|
+| Background | Navy `#0B1A2E` | Same dark navy base |
+| Accent | Gold `#C9A84C` | Phoenix Orange `#F47F25` |
+| Surface cards | `#111E32` with `#1E3550` borders | Same pattern |
+| Text | Light `#E8ECF1`, muted `#8A98AB` | Same hierarchy |
+| Fonts | Playfair Display (headings) + DM Sans (body) | Same pairing |
+| Success/Error | Green `#34D399` / Red `#F87171` | Same |
+
+### Component Patterns (from FootyWeather)
+
+- **StatPill** — compact stat cards with label, value, trend indicator. Used for thermometer numbers, donor counts, team standings.
+- **DashboardMini** — tappable cards with title, subtitle, and child content (mini charts, lists). Used for campaign overview blocks.
+- **MiniBar / MiniLine** — inline micro-charts with animated transitions. Used for donation velocity, daily totals, goal progress.
+- **Card system** — rounded corners (14px), subtle borders, hover states with gold→orange glow. Mobile-first (390px reference frame).
+- **Animations** — `fadeSlideUp` on card entry, `shimmer` for loading states, `pulseGlow` for live indicators (new donation).
+
+### Mobile-First
+
+Public pages (campaign, team, participant) are designed mobile-first. The FootyWeather reference frame is 390px wide — donor pages should look great at that width and scale up gracefully. Most P2P sharing happens via text/social on phones, so the donation page a visitor lands on must be optimized for mobile.
+
+### Admin vs Public
+
+- **Public pages** (participant, team, campaign) — dark theme, polished, mobile-first, FootyWeather aesthetic
+- **Admin dashboard** — can use a lighter/standard admin theme (Tailwind defaults). Doesn't need the same visual treatment. Function over form.
+
+### AI-First Admin (Future — Aligned with CHIRP Redesign)
+
+The admin side is designed to eventually support a **chat-first interface** (same direction as the CHIRP redesign):
+- "Create a Raise and Ride campaign with 4 registration tiers" → AI generates config
+- "Who's at risk of not hitting their goal?" → AI queries participants + donation data
+- "Draft a midpoint check-in drip email" → AI generates copy with merge tokens
+- "Show me daily donation velocity for the last week" → AI renders a DashboardMini with MiniBar chart
+
+This is a future enhancement, not MVP. The block system and config-driven architecture make it possible — AI generates JSON configs, the renderer displays them. Same pattern as CHIRP workspaces.
+
+---
+
 ## Architecture: Config-Driven Block Pages
 
 Every public page (campaign, team, participant) is rendered from a **block config** — a JSON array that defines layout, content, and behavior. This makes pages lightweight, customizable, and fast to spin up.
